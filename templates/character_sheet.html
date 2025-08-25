@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Лист персонажа - Don't Rest Your Head</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/character_sheet.css') }}">
+</head>
+<body>
+    <h1>Don't Rest Your Head</h1>
+
+    <form action="/" method="POST">
+        <div class="left">
+            <div class="field">
+                <label for="name">Меня зовут</label>
+                <input type="text" id="name" name="name" required>
+            </div>
+
+            <div class="field">
+                <label for="description">и я —</label>
+                <input type="text" id="description" name="description">
+            </div>
+
+            <div class="field">
+                <label for="insomnia">Что не дает мне уснуть?</label>
+                <textarea id="insomnia" name="insomnia"></textarea>
+            </div>
+
+            <div class="field">
+                <label for="recent-event">Что случилось только что?</label>
+                <textarea id="recent-event" name="recent-event"></textarea>
+            </div>
+
+            <div class="field">
+                <label for="appearance">Какой я снаружи?</label>
+                <textarea id="appearance" name="appearance"></textarea>
+            </div>
+
+            <div class="field">
+                <label for="true-self">Кто я на самом деле?</label>
+                <textarea id="true-self" name="true-self"></textarea>
+            </div>
+
+            <div class="field">
+                <label for="path">Каков мой путь?</label>
+                <textarea id="path" name="path"></textarea>
+            </div>
+        </div>
+
+        <div class="right">
+            <div class="stat-block">
+                <h3>Реакции</h3>
+                <p>Бей</p>
+                <div class="boxes">
+                    <input type="checkbox" class="checkbox-box" name="reaction-hit1">
+                    <input type="checkbox" class="checkbox-box" name="reaction-hit2">
+                    <input type="checkbox" class="checkbox-box" name="reaction-hit3">
+                </div>
+                <p>Беги</p>
+                <div class="boxes">
+                    <input type="checkbox" class="checkbox-box" name="reaction-run1">
+                    <input type="checkbox" class="checkbox-box" name="reaction-run2">
+                    <input type="checkbox" class="checkbox-box" name="reaction-run3">
+                </div>
+            </div>
+
+            <div class="stat-block">
+                <h3>Дисциплина</h3>
+                <div class="boxes">
+                    <input type="checkbox" class="checkbox-box" checked disabled>
+                    <input type="checkbox" class="checkbox-box" checked disabled>
+                    <input type="checkbox" class="checkbox-box" checked disabled>
+                </div>
+            </div>
+
+            <div class="stat-block">
+                <h3>Безумие</h3>
+                <div class="boxes">
+                    <div class="box"></div>
+                    <div class="box"></div>
+                    <div class="box"></div>
+                </div>
+            </div>
+
+            <div class="stat-block">
+                <h3>Истощение</h3>
+                <div class="boxes">
+                    <div class="box"></div>
+                    <div class="box"></div>
+                    <div class="box"></div>
+                    <div class="box"></div>
+                    <div class="box"></div>
+                </div>
+            </div>
+
+            <div class="stat-block">
+                <h3>Навык Безумия</h3>
+                <input type="text" id="madness-skill" name="madness-skill">
+            </div>
+
+            <div class="stat-block">
+                <h3>Навык Истощения</h3>
+                <input type="text" id="exhaustion-skill" name="exhaustion-skill">
+            </div>
+        </div>
+
+        <button type="submit">Сохранить персонажа</button>
+    </form>
+</body>
+</html>
+

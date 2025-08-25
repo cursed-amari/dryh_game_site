@@ -1,0 +1,325 @@
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@200;300;400;500;600;700&family=PT+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+
+/* ---------------- Переменные ---------------- */
+:root {
+    --color-dark: #0d0b14;
+    --color-purple: #3a225d;
+    --color-red: #8a0303;
+    --color-blue: #1b3b53;
+    --color-light: #c4b5b5;
+    --color-accent: #ff073a;
+    --color-dice-white: #ffffff;
+    --color-dice-red: #ff5252;
+    --color-dice-black: #333333;
+    --color-dice-yellow: #ffeb3b;
+
+    --dice-size: 80px;
+    --dice-perspective: 400px;
+}
+
+/* ---------------- Базовые стили ---------------- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'PT Sans', sans-serif;
+    background-color: var(--color-dark);
+    color: var(--color-light);
+    line-height: 1.6;
+    padding: 20px;
+    min-height: 100vh;
+    background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1IiBoZWlnaHQ9IjUiPgo8cmVjdCB3aWR0aD0iNSIgaGVpZ2h0PSI1IiBmaWxsPSIjMGQwYjE0Ij48L3JlY3Q+CjxwYXRoIGQ9Ik0wIDVMNSAwWk02IDRMNCA2Wk0tMSAxTDEgLTFaIiBzdHJva2U9IiMyYTIwMmYiIHN0cm9rZS13aWR0aD0iMSI+PC9wYXRoPgo8L3N2Zz4=');
+}
+
+h1, h2, h3, h4, h5 {
+    font-family: 'Oswald', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 1rem;
+    color: var(--color-light);
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+}
+
+h1 {
+    font-size: 2.5rem;
+    color: var(--color-accent);
+    text-shadow: 0 0 10px rgba(255,7,58,0.7);
+    text-align: center;
+    margin-bottom: 2rem;
+    border-bottom: 2px solid var(--color-purple);
+    padding-bottom: 1rem;
+}
+
+.master-badge {
+    display: inline-block;
+    background-color: gold;
+    color: var(--color-dark);
+    padding: 3px 8px;
+    border-radius: 3px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    margin-left: 10px;
+}
+
+/* ---------------- Сетка игры ---------------- */
+.game-container {
+    display: grid;
+    grid-template-columns: 250px 1fr;
+    grid-template-rows: 1fr auto;
+    gap: 20px;
+    height: calc(100vh - 120px);
+}
+
+.players-sidebar,
+.center-area,
+.character-sheet {
+    background-color: rgba(13,11,20,0.8);
+    border: 1px solid var(--color-purple);
+    border-radius: 5px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.5);
+    padding: 1.5rem;
+}
+
+.players-sidebar {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+    overflow-y: auto;
+}
+
+.players-list {
+    list-style: none;
+}
+
+.player-item {
+    padding: 10px;
+    margin-bottom: 10px;
+    background-color: rgba(58,34,93,0.3);
+    border: 1px solid var(--color-purple);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.player-item:hover {
+    border-color: var(--color-accent);
+    box-shadow: 0 0 5px rgba(255,7,58,0.5);
+}
+
+.center-area {
+    grid-column: 2;
+    grid-row: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.dice-controls {
+    margin-bottom: 20px;
+}
+
+.dice-control-group {
+    margin-bottom: 15px;
+}
+
+.dice-control-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.dice-control-group input {
+    width: 60px;
+    padding: 5px;
+    background-color: rgba(58,34,93,0.3);
+    border: 1px solid var(--color-purple);
+    border-radius: 4px;
+    color: var(--color-light);
+    text-align: center;
+}
+
+.roll-button {
+    padding: 10px 20px;
+    background-color: var(--color-accent);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+
+.roll-button:hover {
+    background-color: #ff385e;
+}
+
+/* ---------------- Кубики ---------------- */
+.dice-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 20px;
+    min-height: 150px;
+}
+
+.dice-mechanics {
+    width: var(--dice-size);
+    height: var(--dice-size);
+    perspective: var(--dice-perspective);
+    margin: 10px;
+}
+
+.dice {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 1.5s ease-out;
+}
+
+.dice-face {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+    backface-visibility: hidden;
+}
+
+.dice-white .dice-face { background: var(--color-dice-white); color: black; border: 2px solid #ccc; }
+.dice-red .dice-face { background: var(--color-dice-red); color: white; border: 2px solid var(--color-red); }
+.dice-black .dice-face { background: var(--color-dice-black); color: white; border: 2px solid #000; }
+.dice-yellow .dice-face { background: var(--color-dice-yellow); color: black; border: 2px solid #fbc02d; }
+
+.dice-face:nth-child(1) { transform: rotateY(0deg) translateZ(40px); }
+.dice-face:nth-child(2) { transform: rotateY(180deg) translateZ(40px); }
+.dice-face:nth-child(3) { transform: rotateY(90deg) translateZ(40px); }
+.dice-face:nth-child(4) { transform: rotateY(-90deg) translateZ(40px); }
+.dice-face:nth-child(5) { transform: rotateX(90deg) translateZ(40px); }
+.dice-face:nth-child(6) { transform: rotateX(-90deg) translateZ(40px); }
+
+/* ---------------- Статы персонажа ---------------- */
+.stats-form {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 15px;
+}
+
+.stat-group { text-align: center; }
+
+.stat-label { margin-bottom: 5px; font-weight: bold; display: block; }
+
+.stat-input {
+    width: 60px;
+    padding: 8px;
+    text-align: center;
+    background-color: rgba(58,34,93,0.3);
+    border: 1px solid var(--color-purple);
+    border-radius: 4px;
+    color: var(--color-light);
+    font-size: 1.1rem;
+}
+
+.stat-input:focus {
+    outline: none;
+    border-color: var(--color-accent);
+    box-shadow: 0 0 5px rgba(255,7,58,0.5);
+}
+
+.character-info {
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid var(--color-purple);
+}
+
+.character-info p { margin-bottom: 8px; }
+
+/* ---------------- Модальное окно ---------------- */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0,0,0,0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: 0.3s;
+    z-index: 1000;
+}
+
+.modal-overlay.active { opacity: 1; visibility: visible; }
+
+.modal {
+    background-color: rgba(13,11,20,0.95);
+    border: 2px solid var(--color-purple);
+    border-radius: 8px;
+    width: 90%;
+    max-width: 600px;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 0 30px rgba(255,7,58,0.3);
+    position: relative;
+}
+
+.modal-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--color-purple);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    color: var(--color-light);
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.modal-close:hover { color: var(--color-accent); }
+
+.modal-body { padding: 1.5rem; }
+
+.player-stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.player-stat {
+    background-color: rgba(58,34,93,0.3);
+    padding: 10px;
+    border-radius: 4px;
+    text-align: center;
+}
+
+.player-stat-value { font-size: 1.5rem; font-weight: bold; color: var(--color-accent); }
+
+.player-details p {
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(58,34,93,0.5);
+}
+
+/* ---------------- Адаптив ---------------- */
+@media (max-width: 968px) {
+    .game-container {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr auto;
+        height: auto;
+    }
+    .players-sidebar { grid-row: 1; }
+    .center-area { grid-row: 2; }
+    .character-sheet { grid-row: 3; }
+    .modal { width: 95%; }
+}

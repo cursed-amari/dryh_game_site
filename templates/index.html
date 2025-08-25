@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Don't Rest Your Head</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+</head>
+<body>
+    <div class="master-btn">
+        <a href="{{url_for('master')}}" class="btn btn-master">Master</a>
+    </div>
+
+    <div class="center-container">
+        <h1>Don't Rest Your Head</h1>
+
+        {% if context %}
+            <div class="character-name">{{context.name}}</div>
+        {% endif %}
+
+        <div class="btn-container">
+            <a href="{{url_for('character_sheet')}}" class="btn">Create Character</a>
+            <a href="{{url_for('game')}}" class="btn">Game</a>
+        </div>
+    </div>
+</body>
+</html>

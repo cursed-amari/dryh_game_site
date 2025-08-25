@@ -1,0 +1,109 @@
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@300;500;700&family=PT+Sans:wght@400;700&display=swap');
+:root {
+    --color-dark: #0d0b14;
+    --color-purple: #3a225d;
+    --color-light: #c4b5b5;
+    --color-accent: #ff073a;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+    font-family: 'PT Sans', sans-serif;
+    background-color: var(--color-dark);
+    color: var(--color-light);
+    min-height: 100vh;
+    padding: 2rem;
+}
+h1 {
+    font-family: 'Oswald', sans-serif;
+    font-size: 3rem;
+    color: var(--color-accent);
+    margin-bottom: 2rem;
+    text-align: center;
+    text-shadow: 0 0 10px rgba(255, 7, 58, 0.7);
+}
+form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+.left, .right {
+    background: rgba(20, 16, 32, 0.9);
+    border: 2px solid var(--color-purple);
+    border-radius: 10px;
+    padding: 1.5rem;
+}
+.field {
+    margin-bottom: 1.5rem;
+}
+label {
+    display: block;
+    font-family: 'Oswald', sans-serif;
+    margin-bottom: 0.5rem;
+    font-size: 1.1rem;
+}
+input[type="text"], textarea {
+    width: 100%;
+    padding: 0.8rem;
+    border: 1px solid var(--color-purple);
+    border-radius: 6px;
+    background: #1b1a25;
+    color: var(--color-light);
+    font-size: 1rem;
+}
+textarea { resize: vertical; min-height: 60px; }
+.stat-block {
+    margin-bottom: 1.5rem;
+}
+.stat-block h3 {
+    font-family: 'Oswald', sans-serif;
+    margin-bottom: 0.5rem;
+    font-size: 1.3rem;
+}
+.boxes {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+/* Декоративные квадраты */
+.box {
+    width: 28px;
+    height: 28px;
+    border: 2px solid var(--color-light);
+    border-radius: 4px;
+}
+/* Чекбоксы для Реакций */
+.checkbox-box {
+    appearance: none;
+    width: 28px;
+    height: 28px;
+    border: 2px solid var(--color-light);
+    border-radius: 4px;
+    background: transparent;
+    cursor: pointer;
+    position: relative;
+}
+.checkbox-box:checked {
+    background: var(--color-accent);
+}
+.checkbox-box:disabled {
+    background: var(--color-light);
+    cursor: not-allowed;
+}
+button {
+    grid-column: 1 / -1;
+    padding: 1rem 2rem;
+    background-color: var(--color-accent);
+    border: none;
+    border-radius: 6px;
+    font-family: 'Oswald', sans-serif;
+    font-size: 1.4rem;
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+button:hover {
+    background-color: #ff2a50;
+    box-shadow: 0 0 15px rgba(255, 7, 58, 0.7);
+}

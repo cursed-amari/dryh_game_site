@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Игровая комната - Don't Rest Your Head</title>
+    <script src="https://cdn.socket.io/4.6.1/socket.io.min.js" defer></script>
+    <script src="{{ url_for('static', filename='js/game.js') }}" defer></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/game.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Игровая комната</h1>
+        {% if session.master %}
+            <span class="master-badge">ВЫ МАСТЕР</span>
+        {% endif %}
+    </header>
+
+    <main class="game-container">
+        <aside class="players-sidebar">
+            <h2>Игроки онлайн</h2>
+            <ul class="players-list">
+                {% for player in players %}
+                    {% if not character or player.name != character.name %}
+                        <li class="player-item" data-player-name="{{ player.name }}">{{ player.name }}</li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </aside>
+
+        <section class="center-area">
+            <h2>Бросок кубиков</h2>
+
+            <div class="dice-controls">
+                {% if session.master %}
+                    <div class="dice-control-group">
+                        <label for="yellow-dice">Желтые кубы (1-15):</label>
+                        <input type="number" id="yellow-dice" min="1" max="15" value="3">
+                    </div>
+                {% else %}
+                    <div class="dice-control-group">
+                        <label>Белые кубы (дисциплина): {{ character.discipline if character else 0 }}</label>
+                    </div>
+                    <div class="dice-control-group">
+                        <label for="red-extra">Доп. красные кубы (0-6):</label>
+                        <input type="number" id="red-extra" min="0" max="6" value="0">
+                    </div>
+                    <div class="dice-control-group">
+                        <label for="black-extra">Доп. черные кубы (0-1):</label>
+                        <input type="number" id="black-extra" min="0" max="1" value="0">
+                    </div>
+                {% endif %}
+                <button class="roll-button">Бросить кубы</button>
+            </div>
+
+            <div class="dice-container">
+                <!-- Кубики будут создаваться здесь через JS -->
+            </div>
+        </section>
+
+        {% if not session.master and character %}
+        <section class="character-sheet">
+            <h2>Ваш персонаж: {{ character.name }}</h2>
+            <div class="stats-form">
+                {% for stat in ['madness', 'discipline', 'exhaustion', 'fight', 'flight'] %}
+                <div class="stat-group">
+                    <label class="stat-label">{{ stat.capitalize() }}</label>
+                    <input type="number" class="stat-input" data-stat="{{ stat }}"
+                           value="{{ character[stat] }}"
+                           min="0" {% if stat in ['fight', 'flight'] %} max="3" {% endif %}>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="character-info">
+                <p><strong>Описание:</strong> {{ character.description }}</p>
+                <p><strong>Путь:</strong> {{ character.path }}</p>
+                <p><strong>Навык Безумия:</strong> {{ character['madness-skill'] }}</p>
+                <p><strong>Навык Истощения:</strong> {{ character['exhaustion-skill'] }}</p>
+            </div>
+        </section>
+        {% endif %}
+    </main>
+
+    <!-- Модальное окно -->
+    <div class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-player-name">Имя персонажа</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="player-stats">
+                    {% for stat in ['madness', 'discipline', 'exhaustion', 'fight', 'flight'] %}
+                    <div class="player-stat">
+                        <div class="player-stat-label">{{ stat.capitalize() }}</div>
+                        <div class="player-stat-value" data-stat="{{ stat }}">0</div>
+                    </div>
+                    {% endfor %}
+                </div>
+                <div class="player-details">
+                    {% for field in ['description', 'path', 'insomnia', 'recent-event', 'appearance', 'true-self', 'madness-skill', 'exhaustion-skill'] %}
+                    <p><strong>{{ field.replace('-', ' ').capitalize() }}:</strong> <span data-field="{{ field }}"></span></p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+    const socket = io();
+    const playersData = {};
+
+    // Сохраняем начальные данные игроков из шаблона
+    {% for player in players %}
+        playersData["{{ player.name }}"] = {{ player | tojson }};
+    {% endfor %}
+
+    const diceContainer = document.querySelector('.dice-container');
+    const playersList = document.querySelector('.players-list');
+    const modalOverlay = document.querySelector('.modal-overlay');
+    const modalClose = modalOverlay.querySelector('.modal-close');
+    const rollButton = document.querySelector('.roll-button');
+
+    const diceAngles = {
+        1: { x: 0, y: 0 },
+        2: { x: 0, y: 180 },
+        3: { x: 0, y: -90 },
+        4: { x: 0, y: 90 },
+        5: { x: -90, y: 0 },
+        6: { x: 90, y: 0 }
+    };
+
+    // ------------------- Функции -------------------
+
+    const updateStat = (stat, value) => {
+        socket.emit('update_character', { [stat]: parseInt(value) });
+    };
+
+    const createDiceElement = (value, color) => {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'dice-mechanics';
+        const dice = document.createElement('div');
+        dice.className = `dice dice-${color}`;
+        for (let i = 1; i <= 6; i++) {
+            const face = document.createElement('div');
+            face.className = 'dice-face';
+            face.textContent = i;
+            dice.appendChild(face);
+        }
+        wrapper.appendChild(dice);
+
+        setTimeout(() => {
+            const randX = 360 * (Math.floor(Math.random() * 4) + 2);
+            const randY = 360 * (Math.floor(Math.random() * 4) + 2);
+            dice.style.transform = `rotateX(${randX + diceAngles[value].x}deg) rotateY(${randY + diceAngles[value].y}deg)`;
+        }, 100);
+
+        return wrapper;
+    };
+
+    const displayDiceResult = (data) => {
+        // Создаём блок для нового броска
+        const rollBlock = document.createElement('div');
+        rollBlock.className = 'roll-block';
+        rollBlock.style.display = 'flex';
+        rollBlock.style.flexWrap = 'wrap';
+        rollBlock.style.justifyContent = 'center';
+        rollBlock.style.gap = '15px';
+        rollBlock.style.marginBottom = '20px';
+
+        const title = document.createElement('h3');
+        title.textContent = `Бросок ${data.player_name}`;
+        title.style.width = '100%';
+        title.style.textAlign = 'center';
+        rollBlock.appendChild(title);
+
+        const appendDice = (arr, color) => arr.forEach(v => rollBlock.appendChild(createDiceElement(v, color)));
+
+        if (data.type === 'yellow') appendDice(data.results, 'yellow');
+        else {
+            appendDice(data.white_results, 'white');
+            appendDice(data.red_results, 'red');
+            appendDice(data.black_results, 'black');
+        }
+
+        // Добавляем новый бросок в начало
+        diceContainer.prepend(rollBlock);
+
+        // Оставляем на экране только два последних броска
+        while (diceContainer.children.length > 2) {
+            diceContainer.removeChild(diceContainer.lastChild);
+        }
+    };
+
+    const openPlayerModal = (playerName) => {
+        const player = playersData[playerName];
+        if (!player) return;
+
+        modalOverlay.querySelectorAll('[data-stat]').forEach(el => {
+            el.textContent = player[el.dataset.stat] || 0;
+        });
+
+        modalOverlay.querySelectorAll('[data-field]').forEach(el => {
+            el.textContent = player[el.dataset.field] || '';
+        });
+
+        modalOverlay.classList.add('active');
+    };
+
+    const closePlayerModal = () => modalOverlay.classList.remove('active');
+
+    const refreshPlayersList = (players) => {
+        playersList.innerHTML = '';
+        Object.keys(playersData).forEach(k => delete playersData[k]);
+        players.forEach(player => {
+            playersData[player.name] = player;
+            {% if character %}
+                if (player.name === "{{ character.name }}") return;
+            {% endif %}
+            const li = document.createElement('li');
+            li.className = 'player-item';
+            li.textContent = player.name;
+            li.dataset.playerName = player.name;
+            playersList.appendChild(li);
+        });
+
+        if (!playersList.children.length) {
+            playersList.innerHTML = '<li>Нет других игроков</li>';
+        }
+    };
+
+    // ------------------- Обработчики -------------------
+
+    playersList.addEventListener('click', e => {
+        const li = e.target.closest('.player-item');
+        if (li) openPlayerModal(li.dataset.playerName);
+    });
+
+    rollButton.addEventListener('click', () => {
+        {% if session.master %}
+            const yellow = parseInt(document.getElementById('yellow-dice').value) || 3;
+            socket.emit('roll_dice', { yellow });
+        {% else %}
+            const red = parseInt(document.getElementById('red-extra').value) || 0;
+            const black = parseInt(document.getElementById('black-extra').value) || 0;
+            socket.emit('roll_dice', { red_extra: red, black_extra: black });
+        {% endif %}
+    });
+
+    document.querySelectorAll('.stat-input').forEach(input => {
+        input.addEventListener('change', () => updateStat(input.dataset.stat, input.value));
+    });
+
+    socket.on('dice_rolled', displayDiceResult);
+    socket.on('update_players', refreshPlayersList);
+
+    modalClose.addEventListener('click', closePlayerModal);
+    modalOverlay.addEventListener('click', e => { if (e.target === modalOverlay) closePlayerModal(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closePlayerModal(); });
+});
+
+    </script>
+</body>
+</html>
+
+
