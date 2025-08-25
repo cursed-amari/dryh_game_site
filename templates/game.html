@@ -72,10 +72,12 @@
                 {% endfor %}
             </div>
             <div class="character-info">
-                <p><strong>Описание:</strong> {{ character.description }}</p>
-                <p><strong>Путь:</strong> {{ character.path }}</p>
-                <p><strong>Навык Безумия:</strong> {{ character['madness-skill'] }}</p>
-                <p><strong>Навык Истощения:</strong> {{ character['exhaustion-skill'] }}</p>
+                <div class="info-item"><strong>Описание:</strong> {{ character.description }}</div>
+                <div class="info-item"><strong>Бессонница:</strong> {{ character.insomnia }}</div>
+                <div class="info-item"><strong>Недавнее событие:</strong> {{ character['recent-event'] }}</div>
+                <div class="info-item"><strong>Внешность:</strong> {{ character.appearance }}</div>
+                <div class="info-item"><strong>Истинное Я:</strong> {{ character['true-self'] }}</div>
+                <div class="info-item"><strong>Путь:</strong> {{ character.path }}</div>
             </div>
         </section>
         {% endif %}

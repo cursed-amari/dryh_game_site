@@ -107,3 +107,22 @@ button:hover {
     background-color: #ff2a50;
     box-shadow: 0 0 15px rgba(255, 7, 58, 0.7);
 }
+
+.reaction-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.star {
+    font-size: 1.2rem;
+    margin: 0 0.5rem;
+    color: var(--color-accent);
+}
+
+.footer {
+    font-size: 0.9rem;
+    font-style: italic;
+    margin-top: 1rem;
+    text-align: left;
+}

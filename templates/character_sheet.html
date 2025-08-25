@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/character_sheet.css') }}">
 </head>
 <body>
-    <h1>Don't Rest Your Head</h1>
+    <h1>Don’t rest your head</h1>
 
     <form action="/" method="POST">
         <div class="left">
@@ -48,19 +48,22 @@
         </div>
 
         <div class="right">
-            <div class="stat-block">
+            <div class="stat-block" id="reactions">
                 <h3>Реакции</h3>
-                <p>Бей</p>
-                <div class="boxes">
-                    <input type="checkbox" class="checkbox-box" name="reaction-hit1">
-                    <input type="checkbox" class="checkbox-box" name="reaction-hit2">
-                    <input type="checkbox" class="checkbox-box" name="reaction-hit3">
-                </div>
-                <p>Беги</p>
-                <div class="boxes">
-                    <input type="checkbox" class="checkbox-box" name="reaction-run1">
-                    <input type="checkbox" class="checkbox-box" name="reaction-run2">
-                    <input type="checkbox" class="checkbox-box" name="reaction-run3">
+                <div class="reaction-row">
+                    <div class="boxes">
+                        <input type="checkbox" class="checkbox-box" name="reaction-hit1">
+                        <input type="checkbox" class="checkbox-box" name="reaction-hit2">
+                        <input type="checkbox" class="checkbox-box" name="reaction-hit3">
+                    </div>
+                    <span>Бей</span>
+                    <span class="star">✦</span>
+                    <span>Беги</span>
+                    <div class="boxes">
+                        <input type="checkbox" class="checkbox-box" name="reaction-run1">
+                        <input type="checkbox" class="checkbox-box" name="reaction-run2">
+                        <input type="checkbox" class="checkbox-box" name="reaction-run3">
+                    </div>
                 </div>
             </div>
 
@@ -90,6 +93,7 @@
                     <div class="box"></div>
                     <div class="box"></div>
                     <div class="box"></div>
+                    <div class="box"></div>
                 </div>
             </div>
 
@@ -102,10 +106,35 @@
                 <h3>Навык Истощения</h3>
                 <input type="text" id="exhaustion-skill" name="exhaustion-skill">
             </div>
+
+            <p class="footer">В начале игры: Устойчивость 3, Реакции 3 (на выбор)</p>
         </div>
 
         <button type="submit">Сохранить персонажа</button>
     </form>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const reactionCheckboxes = document.querySelectorAll("#reactions .checkbox-box");
+    const maxReactions = 3;
+
+    reactionCheckboxes.forEach(cb => {
+        cb.addEventListener("change", () => {
+            const checked = document.querySelectorAll("#reactions .checkbox-box:checked").length;
+
+            if (checked >= maxReactions) {
+                // блокируем пустые
+                reactionCheckboxes.forEach(c => {
+                    if (!c.checked) c.disabled = true;
+                });
+            } else {
+                // разблокируем все
+                reactionCheckboxes.forEach(c => c.disabled = false);
+            }
+        });
+    });
+});
+</script>
 </body>
 </html>
+
 

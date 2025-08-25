@@ -240,6 +240,18 @@ h1 {
 
 .character-info p { margin-bottom: 8px; }
 
+.character-info {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px 20px;
+    margin-top: 15px;
+}
+
+.character-info .info-item {
+    padding: 8px 10px;
+    border-radius: 6px;
+}
+
 /* ---------------- Модальное окно ---------------- */
 .modal-overlay {
     position: fixed;

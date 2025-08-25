@@ -49,6 +49,10 @@ def character_sheet():
 @app.route("/master")
 def master():
     session["master"] = True
+    session["coins"] = {
+        "hope": 0,
+        "despair": 0
+    }
     return redirect("/game")
 
 
@@ -116,6 +120,7 @@ def handle_roll_dice(data):
         yellow_dice = max(1, min(15, yellow_dice))
 
         results = [random.randint(1, 6) for _ in range(yellow_dice)]
+        results.sort()
         current_roll = {
             'type': 'yellow',
             'player_name': player_name,
@@ -131,6 +136,10 @@ def handle_roll_dice(data):
         red_results = [random.randint(1, 6) for _ in range(red_dice)]
         black_results = [random.randint(1, 6) for _ in range(black_dice)]
 
+        white_results.sort()
+        red_results.sort()
+        black_results.sort()
+
         current_roll = {
             'type': 'player',
             'player_name': player_name,
@@ -143,6 +152,17 @@ def handle_roll_dice(data):
         }
     if current_roll:
         emit('dice_rolled', current_roll, broadcast=True)
+
+
+@socketio.on("update_coins")
+def handle_update_coins(data):
+    if not session.get("master", False):
+        return
+
+    hope_coins = max(0, data.get("hope", session["coins"]["hope"]))
+    despair_coins = max(0, data.get("despair", session["coins"]["despair"]))
+
+    emit("update_coins", {"hope": hope_coins, "despair": despair_coins}, broadcast=True)
 
 
 if __name__ == '__main__':
