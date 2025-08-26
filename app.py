@@ -69,7 +69,6 @@ def game():
 def on_connect():
     char = session.get("character")
     is_master = session.get("master", False)
-
     if char and isinstance(char, dict):
         char_data = char.copy()
         char_data["is_master"] = is_master
@@ -79,6 +78,9 @@ def on_connect():
 
         players = [user for user in online_users.values() if not user.get("is_master", False)]
         emit("update_players", players, broadcast=True)
+    if is_master:
+        coins = session.get("coins", {"hope": 0, "despair": 0})
+        emit("update_coins", coins)
 
 
 @socketio.on("disconnect")
@@ -103,6 +105,8 @@ def handle_update_character(data):
             for field in allowed_fields:
                 if field in data:
                     session["character"][field] = data[field]
+        if not session.modified:
+            session.modified = True
 
         players = [user for user in online_users.values() if not user.get("is_master", False)]
         emit("update_players", players, broadcast=True)
@@ -163,6 +167,12 @@ def handle_update_coins(data):
     session["coins"]["despair"] = max(0, data.get("despair", session["coins"]["despair"]))
 
     emit("update_coins", {"hope": session["coins"]["hope"], "despair": session["coins"]["despair"]}, broadcast=True)
+
+
+@socketio.on("request_coins")
+def handle_request_coins():
+    coins = session.get("coins", {"hope": 0, "despair": 0})
+    emit("update_coins", coins)
 
 
 if __name__ == '__main__':
