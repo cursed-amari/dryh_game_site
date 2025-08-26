@@ -233,23 +233,89 @@ h1 {
 }
 
 .character-info {
-    margin-top: 20px;
-    padding-top: 15px;
-    border-top: 1px solid var(--color-purple);
-}
-
-.character-info p { margin-bottom: 8px; }
-
-.character-info {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 10px 20px;
     margin-top: 15px;
+    margin-left: 105px;
 }
 
 .character-info .info-item {
     padding: 8px 10px;
     border-radius: 6px;
+}
+
+.dice-area-grid {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 20px;
+    height: 100%;
+}
+
+.dice-results {
+    background-color: rgba(13,11,20,0.8);
+    border: 1px solid var(--color-purple);
+    border-radius: 5px;
+    padding: 1rem;
+    overflow-y: auto;
+}
+
+.controls-section {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.coins-section {
+    background-color: rgba(13,11,20,0.8);
+    border: 1px solid var(--color-purple);
+    border-radius: 5px;
+    padding: 1.5rem;
+    box-shadow: 0 0 20px rgba(0,0,0,0.5);
+}
+
+.coins-section h3 {
+    text-align: center;
+    margin-bottom: 1rem;
+    color: var(--color-light);
+    border-bottom: 1px solid var(--color-purple);
+    padding-bottom: 0.5rem;
+}
+
+.coins-container {
+    display: flex;
+    justify-content: space-around;
+}
+
+.coin-counter {
+    text-align: center;
+}
+
+.coin-counter label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+}
+
+.coin-counter input {
+    width: 80px;
+    padding: 8px;
+    text-align: center;
+    background-color: rgba(58,34,93,0.3);
+    border: 1px solid var(--color-purple);
+    border-radius: 4px;
+    color: var(--color-light);
+    font-size: 1.1rem;
+}
+
+.coin-counter input:read-only {
+    background-color: rgba(58,34,93,0.1);
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.coins-section[style*="display: none"] {
+    display: none !important;
 }
 
 /* ---------------- Модальное окно ---------------- */

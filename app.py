@@ -159,10 +159,10 @@ def handle_update_coins(data):
     if not session.get("master", False):
         return
 
-    hope_coins = max(0, data.get("hope", session["coins"]["hope"]))
-    despair_coins = max(0, data.get("despair", session["coins"]["despair"]))
+    session["coins"]["hope"] = max(0, data.get("hope", session["coins"]["hope"]))
+    session["coins"]["despair"] = max(0, data.get("despair", session["coins"]["despair"]))
 
-    emit("update_coins", {"hope": hope_coins, "despair": despair_coins}, broadcast=True)
+    emit("update_coins", {"hope": session["coins"]["hope"], "despair": session["coins"]["despair"]}, broadcast=True)
 
 
 if __name__ == '__main__':
