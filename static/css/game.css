@@ -192,6 +192,26 @@ h1 {
     backface-visibility: hidden;
 }
 
+.roll-block {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 20px;
+    width: 100%;
+    align-items: center;
+}
+
+.roll-block-title {
+    width: 100%;
+    text-align: center;
+    margin: 0;
+    padding: 0.25rem 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--color-light);
+}
+
 .dice-white .dice-face { background: var(--color-dice-white); color: black; border: 2px solid #ccc; }
 .dice-red .dice-face { background: var(--color-dice-red); color: white; border: 2px solid var(--color-red); }
 .dice-black .dice-face { background: var(--color-dice-black); color: white; border: 2px solid #000; }
