@@ -235,9 +235,6 @@
         Object.keys(playersData).forEach(k => delete playersData[k]);
         players.forEach(player => {
             playersData[player.name] = player;
-            {% if character %}
-                if (player.name === "{{ character.name }}") return;
-            {% endif %}
             const li = document.createElement('li');
             li.className = 'player-item';
             li.textContent = player.name;
