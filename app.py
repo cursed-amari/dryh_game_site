@@ -43,6 +43,7 @@ def index():
             "fight": fight,
             "flight": flight,
             "is_master": True if request.form.get("is_master") == "on" else False,
+            "in_game": False
         }
 
         if online_users[token]["is_master"]:
@@ -80,10 +81,11 @@ def on_connect():
     if not token or token not in online_users:
         return False
 
+    online_users[token]["in_game"] = True
     char_data = online_users[token]
     char_data["sid"] = request.sid
 
-    players = [u for u in online_users.values()]
+    players = [u for u in online_users.values() if u["in_game"]]
     emit("update_players", players, broadcast=True)
 
     if char_data.get("is_master", False):
@@ -92,7 +94,9 @@ def on_connect():
 
 @socketio.on("disconnect")
 def on_disconnect():
-    players = [u for u in online_users.values()]
+    token = request.cookies.get("auth_token")
+    online_users[token]["in_game"] = False
+    players = [u for u in online_users.values() if u["in_game"]]
     emit("update_players", players, broadcast=True)
 
 
@@ -108,7 +112,7 @@ def handle_update_character(data):
         if field in data:
             character[field] = data[field]
 
-    players = [u for u in online_users.values()]
+    players = [u for u in online_users.values() if u["in_game"]]
     emit("update_players", players, broadcast=True)
 
 
