@@ -15,9 +15,7 @@
         {% endif %}
 
         <div class="btn-container">
-            {% if not context %}
             <a href="{{url_for('character_sheet')}}" class="btn">Create Character</a>
-            {% endif %}
             <a href="{{url_for('game')}}" class="btn">Game</a>
         </div>
     </div>
