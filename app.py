@@ -2,9 +2,10 @@ import random
 import uuid
 from flask import Flask, render_template, request, redirect, make_response
 from flask_socketio import SocketIO, emit
+import os
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'your_secret_key_here'
+app.config['SECRET_KEY'] = os.environ.get("secret_code")
 socketio = SocketIO(app, cors_allowed_origins="*")
 
 online_users = {}
