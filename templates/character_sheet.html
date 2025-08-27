@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Лист персонажа - Don't Rest Your Head</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/character_sheet.css') }}">
+    <script src="{{ url_for('static', filename='js/character_sheet.js') }}" defer></script>
 </head>
 <body>
     <h1>Don’t rest your head</h1>
@@ -112,28 +113,6 @@
 
         <button type="submit">Сохранить персонажа</button>
     </form>
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-    const reactionCheckboxes = document.querySelectorAll("#reactions .checkbox-box");
-    const maxReactions = 3;
-
-    reactionCheckboxes.forEach(cb => {
-        cb.addEventListener("change", () => {
-            const checked = document.querySelectorAll("#reactions .checkbox-box:checked").length;
-
-            if (checked >= maxReactions) {
-                // блокируем пустые
-                reactionCheckboxes.forEach(c => {
-                    if (!c.checked) c.disabled = true;
-                });
-            } else {
-                // разблокируем все
-                reactionCheckboxes.forEach(c => c.disabled = false);
-            }
-        });
-    });
-});
-</script>
 </body>
 </html>
 
