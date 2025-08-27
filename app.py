@@ -1,12 +1,18 @@
 import random
-
-from flask import Flask, render_template, session, url_for, request, redirect
+import uuid
+from flask import Flask, render_template, request, redirect, make_response
 from flask_socketio import SocketIO, emit
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your_secret_key_here'
 socketio = SocketIO(app, cors_allowed_origins="*")
+
 online_users = {}
+master_data = {"coins": {"hope": 0, "despair": 0}}
+
+
+def generate_token():
+    return str(uuid.uuid4())
 
 
 @app.route('/', methods=["POST", "GET"])
@@ -16,9 +22,11 @@ def index():
                  request.form.get("reaction-hit3")]
         flight = [request.form.get("reaction-run1"), request.form.get("reaction-run2"),
                   request.form.get("reaction-run3")]
-        fight = sum(list(map(lambda x: 1 if x else 0, fight)))
-        flight = sum(list(map(lambda x: 1 if x else 0, flight)))
-        session["character"] = {
+        fight = sum([1 for x in fight if x])
+        flight = sum([1 for x in flight if x])
+
+        token = generate_token()
+        online_users[token] = {
             "name": request.form.get("name"),
             "description": request.form.get("description"),
             "insomnia": request.form.get("insomnia"),
@@ -32,13 +40,18 @@ def index():
             "discipline": 3,
             "exhaustion": 0,
             "fight": fight,
-            "flight": flight
+            "flight": flight,
+            "is_master": False,
         }
 
-    if "master" not in session:
-        session["master"] = False
+        resp = make_response(redirect("/"))
+        resp.set_cookie("auth_token", token, httponly=True)
+        return resp
 
-    return render_template("index.html", context=session.get("character"))
+    token = request.cookies.get("auth_token")
+    character = online_users.get(token) if token else None
+
+    return render_template("index.html", context=character)
 
 
 @app.route('/character-sheet')
@@ -48,83 +61,79 @@ def character_sheet():
 
 @app.route("/master")
 def master():
-    session["master"] = True
-    session["coins"] = {
-        "hope": 0,
-        "despair": 0
+    token = generate_token()
+    online_users[token] = {
+        "name": "Мастер",
+        "is_master": True,
     }
-    return redirect("/game")
+    master_data["coins"] = {"hope": 0, "despair": 0}
+    resp = make_response(redirect("/game"))
+    resp.set_cookie("auth_token", token, httponly=True)
+    return resp
 
 
 @app.route("/game")
 def game():
-    character = session.get("character")
-    if not character:
+    token = request.cookies.get("auth_token")
+    if not token or token not in online_users:
         return redirect("/character-sheet")
-    players = [user for user in online_users.values() if not user.get("is_master", False)]
+
+    character = online_users[token]
+    players = [u for t, u in online_users.items() if not u.get("is_master", False)]
     return render_template("game.html", character=character, players=players)
 
 
 @socketio.on("connect")
 def on_connect():
-    char = session.get("character")
-    is_master = session.get("master", False)
-    if char and isinstance(char, dict):
-        char_data = char.copy()
-        char_data["is_master"] = is_master
-        char_data["sid"] = request.sid
+    token = request.cookies.get("auth_token")
+    if not token or token not in online_users:
+        return False
 
-        online_users[request.sid] = char_data
+    char_data = online_users[token]
+    char_data["sid"] = request.sid
 
-        players = [user for user in online_users.values() if not user.get("is_master", False)]
-        emit("update_players", players, broadcast=True)
-    if is_master:
-        coins = session.get("coins", {"hope": 0, "despair": 0})
-        emit("update_coins", coins)
+    players = [u for u in online_users.values() if not u.get("is_master", False)]
+    emit("update_players", players, broadcast=True)
+
+    if char_data.get("is_master", False):
+        emit("update_coins", master_data["coins"])
 
 
 @socketio.on("disconnect")
 def on_disconnect():
-    if request.sid in online_users:
-        del online_users[request.sid]
-        players = [user for user in online_users.values() if not user.get("is_master", False)]
-        emit("update_players", players, broadcast=True)
+    players = [u for u in online_users.values() if not u.get("is_master", False)]
+    emit("update_players", players, broadcast=True)
 
 
 @socketio.on("update_character")
 def handle_update_character(data):
-    if request.sid in online_users:
-        character = online_users[request.sid]
+    token = request.cookies.get("auth_token")
+    if not token or token not in online_users:
+        return
 
-        allowed_fields = ["madness", "discipline", "exhaustion", "fight", "flight"]
-        for field in allowed_fields:
-            if field in data:
-                character[field] = data[field]
+    character = online_users[token]
+    allowed_fields = ["madness", "discipline", "exhaustion", "fight", "flight"]
+    for field in allowed_fields:
+        if field in data:
+            character[field] = data[field]
 
-        if "character" in session:
-            for field in allowed_fields:
-                if field in data:
-                    session["character"][field] = data[field]
-        if not session.modified:
-            session.modified = True
-
-        players = [user for user in online_users.values() if not user.get("is_master", False)]
-        emit("update_players", players, broadcast=True)
+    players = [u for u in online_users.values() if not u.get("is_master", False)]
+    emit("update_players", players, broadcast=True)
 
 
 @socketio.on('roll_dice')
 def handle_roll_dice(data):
-    current_roll = {}
-    char = session.get("character")
-    is_master = session.get("master", False)
-    player_name = char.get("name", "Аноним") if char else "Аноним"
+    token = request.cookies.get("auth_token")
+    if not token or token not in online_users:
+        return
+
+    char = online_users[token]
+    is_master = char.get("is_master", False)
+    player_name = char.get("name", "Аноним")
 
     if is_master:
-        yellow_dice = data.get('yellow', 1)
-        yellow_dice = max(1, min(15, yellow_dice))
-
-        results = [random.randint(1, 6) for _ in range(yellow_dice)]
-        results.sort()
+        yellow_dice = max(1, min(15, data.get('yellow', 1)))
+        results = sorted([random.randint(1, 6) for _ in range(yellow_dice)])
         current_roll = {
             'type': 'yellow',
             'player_name': player_name,
@@ -136,13 +145,9 @@ def handle_roll_dice(data):
         red_dice = char.get("madness", 0) + data.get('red_extra', 0)
         black_dice = char.get("exhaustion", 0) + data.get('black_extra', 0)
 
-        white_results = [random.randint(1, 6) for _ in range(white_dice)]
-        red_results = [random.randint(1, 6) for _ in range(red_dice)]
-        black_results = [random.randint(1, 6) for _ in range(black_dice)]
-
-        white_results.sort()
-        red_results.sort()
-        black_results.sort()
+        white_results = sorted([random.randint(1, 6) for _ in range(white_dice)])
+        red_results = sorted([random.randint(1, 6) for _ in range(red_dice)])
+        black_results = sorted([random.randint(1, 6) for _ in range(black_dice)])
 
         current_roll = {
             'type': 'player',
@@ -154,26 +159,26 @@ def handle_roll_dice(data):
             'red_results': red_results,
             'black_results': black_results
         }
-    if current_roll:
-        emit('dice_rolled', current_roll, broadcast=True)
+
+    emit('dice_rolled', current_roll, broadcast=True)
 
 
 @socketio.on("update_coins")
 def handle_update_coins(data):
-    if not session.get("master", False):
+    token = request.cookies.get("auth_token")
+    if not token or token not in online_users or not online_users[token].get("is_master", False):
         return
 
-    session["coins"]["hope"] = max(0, data.get("hope", session["coins"]["hope"]))
-    session["coins"]["despair"] = max(0, data.get("despair", session["coins"]["despair"]))
+    master_data["coins"]["hope"] = max(0, data.get("hope", master_data["coins"]["hope"]))
+    master_data["coins"]["despair"] = max(0, data.get("despair", master_data["coins"]["despair"]))
 
-    emit("update_coins", {"hope": session["coins"]["hope"], "despair": session["coins"]["despair"]}, broadcast=True)
+    emit("update_coins", master_data["coins"], broadcast=True)
 
 
 @socketio.on("request_coins")
 def handle_request_coins():
-    coins = session.get("coins", {"hope": 0, "despair": 0})
-    emit("update_coins", coins)
+    emit("update_coins", master_data["coins"])
 
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=5100)
+    socketio.run(app, host="0.0.0.0", port=5100, use_reloader=False, log_output=True)
