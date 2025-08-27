@@ -41,8 +41,11 @@ def index():
             "exhaustion": 0,
             "fight": fight,
             "flight": flight,
-            "is_master": False,
+            "is_master": True if request.form.get("is_master") == "on" else False,
         }
+
+        if online_users[token]["is_master"]:
+            master_data["coins"] = {"hope": 0, "despair": 0}
 
         resp = make_response(redirect("/"))
         resp.set_cookie("auth_token", token, httponly=True)
@@ -59,19 +62,6 @@ def character_sheet():
     return render_template("character_sheet.html")
 
 
-@app.route("/master")
-def master():
-    token = generate_token()
-    online_users[token] = {
-        "name": "Мастер",
-        "is_master": True,
-    }
-    master_data["coins"] = {"hope": 0, "despair": 0}
-    resp = make_response(redirect("/game"))
-    resp.set_cookie("auth_token", token, httponly=True)
-    return resp
-
-
 @app.route("/game")
 def game():
     token = request.cookies.get("auth_token")
@@ -79,7 +69,7 @@ def game():
         return redirect("/character-sheet")
 
     character = online_users[token]
-    players = [u for t, u in online_users.items() if not u.get("is_master", False)]
+    players = [u for t, u in online_users.items()]
     return render_template("game.html", character=character, players=players)
 
 
@@ -92,7 +82,7 @@ def on_connect():
     char_data = online_users[token]
     char_data["sid"] = request.sid
 
-    players = [u for u in online_users.values() if not u.get("is_master", False)]
+    players = [u for u in online_users.values()]
     emit("update_players", players, broadcast=True)
 
     if char_data.get("is_master", False):
@@ -101,7 +91,7 @@ def on_connect():
 
 @socketio.on("disconnect")
 def on_disconnect():
-    players = [u for u in online_users.values() if not u.get("is_master", False)]
+    players = [u for u in online_users.values()]
     emit("update_players", players, broadcast=True)
 
 
@@ -117,7 +107,7 @@ def handle_update_character(data):
         if field in data:
             character[field] = data[field]
 
-    players = [u for u in online_users.values() if not u.get("is_master", False)]
+    players = [u for u in online_users.values()]
     emit("update_players", players, broadcast=True)
 
 

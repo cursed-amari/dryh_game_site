@@ -17,12 +17,6 @@ body {
     position: relative;
 }
 
-.master-btn {
-    position: absolute;
-    top: 2rem;
-    right: 2rem;
-}
-
 .center-container {
     display: flex;
     flex-direction: column;
@@ -68,15 +62,6 @@ h1 {
 .btn:hover {
     background-color: var(--color-accent);
     box-shadow: 0 0 15px rgba(255, 7, 58, 0.7);
-}
-
-.btn-master {
-    background-color: transparent;
-    border: 2px solid var(--color-accent);
-}
-
-.btn-master:hover {
-    background-color: var(--color-accent);
 }
 
 .btn-container {
