@@ -13,44 +13,44 @@
     <form action="/" method="POST">
         <div class="left">
             <div class="field">
-                <label for="name">Меня зовут</label>
+                <label for="name" title="Твоё имя">Меня зовут</label>
                 <input type="text" id="name" name="name" required>
             </div>
 
             <div class="field">
-                <label for="description">и я —</label>
-                <input type="text" id="description" name="description">
+                <label for="description" title="Кто ты (профессия, род занятий)">и я —</label>
+                <input type="text" id="description" name="description" required>
             </div>
 
             <div class="field">
-                <label for="insomnia">Что не дает мне уснуть?</label>
-                <textarea id="insomnia" name="insomnia"></textarea>
+                <label for="insomnia" title="Причина по которой твой персонаж не может уснуть">Что не дает мне уснуть?</label>
+                <textarea id="insomnia" name="insomnia" required></textarea>
             </div>
 
             <div class="field">
-                <label for="recent-event">Что случилось только что?</label>
-                <textarea id="recent-event" name="recent-event"></textarea>
+                <label for="recent-event" title="Краткое описание первой сцены твоего персонажа">Что случилось только что?</label>
+                <textarea id="recent-event" name="recent-event" required></textarea>
             </div>
 
             <div class="field">
-                <label for="appearance">Какой я снаружи?</label>
-                <textarea id="appearance" name="appearance"></textarea>
+                <label for="appearance" title="Внешность твоего персонажа">Какой я снаружи?</label>
+                <textarea id="appearance" name="appearance" required></textarea>
             </div>
 
             <div class="field">
-                <label for="true-self">Кто я на самом деле?</label>
-                <textarea id="true-self" name="true-self"></textarea>
+                <label for="true-self" title="Тайные желания твоего персонажа, то какой он на самом деле внутри">Кто я на самом деле?</label>
+                <textarea id="true-self" name="true-self" required></textarea>
             </div>
 
             <div class="field">
-                <label for="path">Каков мой путь?</label>
-                <textarea id="path" name="path"></textarea>
+                <label for="path" title="Цели персонажа, что было бы если его история была в вакууме. Как бы она закончилась?">Каков мой путь?</label>
+                <textarea id="path" name="path" required></textarea>
             </div>
         </div>
 
         <div class="right">
             <div class="stat-block" id="reactions">
-                <h3>Реакции</h3>
+                <h3 title="Распредели 3 очка между шкалами бей и беги">Реакции</h3>
                 <div class="reaction-row">
                     <div class="boxes">
                         <input type="checkbox" class="checkbox-box" name="reaction-hit1">
@@ -99,19 +99,19 @@
             </div>
 
             <div class="stat-block">
-                <h3>Навык Безумия</h3>
-                <input type="text" id="madness-skill" name="madness-skill">
+                <h3 title="Некая сверхъестественная способность персонажа. Пример: Невидимость, чтение мыслей">Навык Безумия</h3>
+                <input type="text" id="madness-skill" name="madness-skill" required>
             </div>
 
             <div class="stat-block">
-                <h3>Навык Истощения</h3>
-                <input type="text" id="exhaustion-skill" name="exhaustion-skill">
+                <h3 title="Физический навык который у вашего персонажа лучше чем у большинства людей. Пример: Бег, стрельба">Навык Истощения</h3>
+                <input type="text" id="exhaustion-skill" name="exhaustion-skill" required>
             </div>
 
             <p class="footer">В начале игры: Устойчивость 3, Реакции 3 (на выбор)</p>
 
             <div class="stat-block">
-                <h3>Мастер</h3>
+                <h3 title="Отметь это если ты будешь вести игру">Мастер</h3>
                 <input type="checkbox" class="checkbox-box" name="is_master">
             </div>
         </div>

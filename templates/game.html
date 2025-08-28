@@ -95,18 +95,20 @@
                     <input type="number" class="stat-input" data-stat="{{ stat }}"
                            value="{{ character[stat] }}"
                            min="0"
-                           {% if stat in ['madness', 'fight', 'flight'] %} max="3" {% endif %}
+                           {% if stat in ['discipline', 'madness', 'fight', 'flight'] %} max="3" {% endif %}
                            {% if stat == 'exhaustion' %} max="6" {% endif %}>
                 </div>
                 {% endfor %}
             </div>
             <div class="character-info">
-                <div class="info-item"><strong>AND I AM:</strong> {{ character.description }}</div>
-                <div class="info-item"><strong>WHAT'S BEEN KEEPING YOU AWAKE?:</strong> {{ character.insomnia }}</div>
-                <div class="info-item"><strong>WHAT JUST HAPPENED TO YOU?:</strong> {{ character['recent-event'] }}</div>
-                <div class="info-item"><strong>WHAT'S ON THE SURFACE?:</strong> {{ character.appearance }}</div>
-                <div class="info-item"><strong>WHAT LIES BENEATH?:</strong> {{ character['true-self'] }}</div>
-                <div class="info-item"><strong>WHAT'S YOUR PATH?:</strong> {{ character.path }}</div>
+                <div class="info-item"><strong>Талант безумия:</strong> {{ character['madness-skill'] }}</div>
+                <div class="info-item"><strong>Талант истощения:</strong> {{ character['exhaustion-skill'] }}</div>
+                <div class="info-item"><strong>Я:</strong> {{ character.description }}</div>
+                <div class="info-item"><strong>Я не могу уснуть из за:</strong> {{ character.insomnia }}</div>
+                <div class="info-item"><strong>Только что случилось:</strong> {{ character['recent-event'] }}</div>
+                <div class="info-item"><strong>Я выгляжу как:</strong> {{ character.appearance }}</div>
+                <div class="info-item"><strong>Внутри я:</strong> {{ character['true-self'] }}</div>
+                <div class="info-item"><strong>Мой путь это:</strong> {{ character.path }}</div>
             </div>
         </section>
         {% endif %}
