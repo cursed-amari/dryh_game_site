@@ -50,7 +50,7 @@ def index():
             master_data["coins"] = {"hope": 0, "despair": 0}
 
         resp = make_response(redirect("/"))
-        resp.set_cookie("auth_token", token, httponly=True)
+        resp.set_cookie("auth_token", token, httponly=True, max_age=60*60*24*30)
         return resp
 
     token = request.cookies.get("auth_token")
